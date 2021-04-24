@@ -28,7 +28,7 @@
     * 
     */
 
-    var largura = 10;
+    var largura = 5;
     var vetor = [];
     var tamanho = Math.floor(innerWidth / largura);
     function setup() {
@@ -43,14 +43,20 @@
     function draw() {
         background(0, 0, 0);
         qcksrt(vetor, 0, vetor.length - 1);
-        vetor = [];
-        while (vetor.length < tamanho) {
-            let aleatorio = getRandomInt(0, innerHeight);
-            if (!(vetor.includes(aleatorio))) vetor.push(aleatorio);
+        // vetor = [];
+        // while (vetor.length < tamanho) {
+        //     let aleatorio = getRandomInt(0, innerHeight);
+        //     if (!(vetor.includes(aleatorio))) vetor.push(aleatorio);
+        // }
+
+        for (let i = 0; i < vetor.length; i++) {
+                fill(0, 255, 0);
+                rect(i * largura, innerHeight, largura, -vetor[i]);
         }
     }
 
-    function separa(v, p, r) {
+    async function separa(v, p, r) {
+        await sleep(100)
         let c = v[r];
         let t, j = p;
         for (let k = p; k < r; ++k) {
@@ -67,18 +73,17 @@
         return j;
     }
 
-    function qcksrt(v, p, r) {
+    async function qcksrt(v, p, r) {
         while (p < r) {
-            let j = separa(v, p, r);
-            qcksrt(v, p, j - 1);
+            let j = await separa(v, p, r);
+            await qcksrt(v, p, j - 1);
             p = j + 1;
-            for (let i = 0; i < vetor.length; i++) {
-                fill(0, 255, 0);
-                rect(i * largura, innerHeight, largura, -vetor[i]);
-            }
+            
         }
     }
-
+    function sleep(ms){
+        return new Promise(r=> setTimeout(r,ms));
+    }
     function getRandomInt(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
