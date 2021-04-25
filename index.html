@@ -109,7 +109,7 @@
     * 
     */
 
-    var largura = 5;
+    var largura = 2;
     var vetor = [];
     var estados = [];
     var tamanho = Math.floor(innerWidth / largura);
@@ -156,6 +156,7 @@
         textSize(sizeText);
         fill(255);
         text('V(ms) = Swap(ms) , ms = ' + sleepTime, innerWidth - 450, 50 - (sizeText / 2));
+        text('Ordenando : ' + vetor.length + ' valores', innerWidth - 450, 100 - (sizeText / 2));
 
         for (let i = 0; i < vetor.length; i++) {
             if (estados[i] == 0) {
