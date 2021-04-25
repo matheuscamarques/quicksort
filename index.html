@@ -5,11 +5,92 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Quick Sort</title>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.3.1/lib/p5.js"></script>
 </head>
+<style>
+    /* The slider itself */
+    .slider {
+        -webkit-appearance: none;
+        /* Override default CSS styles */
+        appearance: none;
+        width: 100%;
+        /* Full-width */
+        height: 20px;
+        /* Specified height */
+        background: #f8f8f8;
+        /* Grey background */
+        outline: none;
+        /* Remove outline */
+        opacity: 0.7;
+        /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s;
+        /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+    /* Mouse-over effects */
+    .slider:hover {
+        opacity: 1;
+        /* Fully shown on mouse-over */
+
+    }
+
+    /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        /* Override default look */
+        appearance: none;
+        width: 25px;
+        /* Set a specific slider handle width */
+        height: 15px;
+        /* Slider handle height */
+        background: #4CAF50;
+        /* Green background */
+        cursor: pointer;
+        /* Cursor on hover */
+    }
+
+    .slider::-moz-range-thumb {
+        width: 25px;
+        /* Set a specific slider handle width */
+        height: 15px;
+        /* Slider handle height */
+        background: #4CAF50;
+        /* Green background */
+        cursor: pointer;
+        /* Cursor on hover */
+    }
+
+    .slider::-moz-range-thumb:hover {
+        width: 25px;
+        /* Set a specific slider handle width */
+        height: 15px;
+        /* Slider handle height */
+        background: red;
+        /* Green background */
+        cursor: pointer;
+        /* Cursor on hover */
+    }
+
+    .slider::-moz-range-thumb:hover {
+        width: 25px;
+        /* Set a specific slider handle width */
+        height: 15px;
+        /* Slider handle height */
+        background: red;
+        /* Green background */
+        cursor: pointer;
+        /* Cursor on hover */
+    }
+
+    body {
+        background-color: black;
+    }
+</style>
 
 <body>
+
 
 </body>
 
@@ -20,7 +101,7 @@
 <script>
 
     let innerWidth = window.innerWidth;
-    let innerHeight = 400;
+    let innerHeight = window.innerHeight;
     /*
     *   Vetor que vai tamnhos de altura de retangulos
     *   esses valores não devem se repetir
@@ -30,59 +111,118 @@
 
     var largura = 5;
     var vetor = [];
+    var estados = [];
     var tamanho = Math.floor(innerWidth / largura);
+    var reinicia = 0;
+    var sleepTime = 500;
+    var elt;
     function setup() {
         createCanvas(innerWidth, innerHeight);
-        frameRate(5);
+        let input = createInput(sleepTime.toString(), 'range');
+        input.position(innerWidth - 450, 50);
+        input.size(300);
+        input.input(eventInput);
+        elt = input.elt;
+        elt.classList.add('slider');
+        elt.min = '0';
+        elt.max = '1000';
+        elt.step = '50';
+        elt.value = sleepTime.toString();
         while (vetor.length < tamanho) {
-            let aleatorio = getRandomInt(0, innerHeight);
-            if (!(vetor.includes(aleatorio))) vetor.push(aleatorio);
+            let aleatorio = getRandomInt(0, innerHeight - 85);
+            if (!(vetor.includes(aleatorio))) {
+                vetor.push(aleatorio);
+                estados.push(-1);
+            }
         }
-    }
-
-    function draw() {
-        background(0, 0, 0);
         qcksrt(vetor, 0, vetor.length - 1);
-        // vetor = [];
-        // while (vetor.length < tamanho) {
-        //     let aleatorio = getRandomInt(0, innerHeight);
-        //     if (!(vetor.includes(aleatorio))) vetor.push(aleatorio);
-        // }
+    }
+    function eventInput() {
+        sleepTime = this.value();
+    }
+    async function draw() {
+        background(0, 0, 0);
+
+        let sizeText = 18;
+        textSize(sizeText);
+        fill(0,255,0);
+        text('Autor: Matheus de Camargo Marques', 10, sizeText + 2);
+        text('Email: mmarques.1997@alunos.utfpr.edu.br', 10, sizeText * 2 + 2);
+        text('Curso: Engenharia da Computação - UTFPR', 10, sizeText * 3 + 2);
+        text("FPS " + int(getFrameRate()), innerWidth - sizeText * 10, 20);
+        noStroke();
+        
+        
+        textSize(sizeText);
+        fill(255);
+        text('V(ms) = Swap(ms) , ms = ' + sleepTime, innerWidth - 450, 50 - (sizeText / 2));
 
         for (let i = 0; i < vetor.length; i++) {
+            if (estados[i] == 0) {
+                fill(255, 0, 0);
+
+            } else if (estados[i] == 1) {
+                fill(0, 0, 255);
+            } else if (estados[i] == -1) {
                 fill(0, 255, 0);
-                rect(i * largura, innerHeight, largura, -vetor[i]);
+            }
+            noStroke();
+            rect(i * largura, innerHeight, largura, -vetor[i]);
         }
+
+
+
+        return 0;
     }
 
     async function separa(v, p, r) {
-        await sleep(100)
+
+
+        for (let k = p; k < r; ++k) {
+            estados[k] = 1;
+        }
+
         let c = v[r];
         let t, j = p;
+        estados[p] = 0;
         for (let k = p; k < r; ++k) {
             if (v[k] <= c) {
-                t = v[j];
-                v[j] = v[k];
-                v[k] = t;
+
+                await swap(v, j, k);
+                estados[j] = -1;
                 ++j;
+                estados[j] = 0;
             }
         }
+
+        await swap(v, j, r);
+        for (let k = p; k < r; ++k) {
+            if (k != j) {
+                estados[k] = -1;
+            }
+        }
+        return j;
+    }
+
+    async function swap(v, j, r) {
+        await sleep(sleepTime)
         t = v[j];
         v[j] = v[r];
         v[r] = t;
-        return j;
     }
 
     async function qcksrt(v, p, r) {
         while (p < r) {
             let j = await separa(v, p, r);
-            await qcksrt(v, p, j - 1);
+            estados[j] = -1;
+            await Promise.all([qcksrt(v, p, j - 1)]);
             p = j + 1;
-            
+
         }
+
     }
-    function sleep(ms){
-        return new Promise(r=> setTimeout(r,ms));
+    async function sleep(ms) {
+        return new Promise(r => setTimeout(r, ms));
     }
     function getRandomInt(min, max) {
         min = Math.ceil(min);
